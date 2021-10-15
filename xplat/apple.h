@@ -1,0 +1,4 @@
+#ifndef __HXC_XPLAT_IMPLEMENTATION_H__
+#define __HXC_XPLAT_IMPLEMENTATION_H__
+
+#endif
