@@ -22,7 +22,7 @@ Original Library: HXC: The Header-Only Extension Library for C
     ((a).len = (a).max = 0, (a).arr = NULL)
 
 #define arr_free(a) \
-    ((a).len = (a).max = 0, (free((a).arr))
+    ((a).len = (a).max = 0, free((a).arr))
 
 #define arr_rfree(a) \
     do                                      \
@@ -57,7 +57,7 @@ Original Library: HXC: The Header-Only Extension Library for C
 #define arr_expand(type, a, s) \
     ((a).max = (a).len = (s), _arr_roundup32((a).max), (a).arr = (type *)realloc((a).arr, sizeof(type) * (a).max))
 
-#define arr_push(type, a, x)                                            \
+#define arr_push(type, a, v)                                            \
     do                                                                  \
     {                                                                   \
         if ((a).len == (a).max)                                         \
@@ -65,7 +65,7 @@ Original Library: HXC: The Header-Only Extension Library for C
             (a).max = (a).max ? (a).max << 1 : 2;                       \
             (a).arr = (type *)realloc((a).arr, sizeof(type) * (a).max); \
         }                                                               \
-        (a).arr[(a).len++] = (x);                                       \
+        (a).arr[(a).len++] = (v);                                       \
     } while (0)
 
 #define arr_pushp(type, a)                                                                                        \
@@ -89,5 +89,19 @@ Original Library: HXC: The Header-Only Extension Library for C
             expr                                   \
         }                                          \
     } while (0)
+
+#define arr_select(type, src, dst, cond) \
+    arr_foreach(type __elem, src, {      \
+        if(( cond (__elem))) {           \
+            arr_push(type, dst, __elem); \
+        }                                \
+    })
+
+#define arr_prune(type, src, dst, cond)  \
+    arr_foreach(type __elem, src, {      \
+        if(!( cond (__elem))) {          \
+            arr_push(type, dst, __elem); \
+        }                                \
+    })
 
 #endif

@@ -133,12 +133,4 @@ Original Library: HXC: The Header-Only Extension Library for C
 #define _MACRO_FOREACH_99(M, LIST) EXPAND(M FIRSTARG LIST) _MACRO_FOREACH_98(M, RESTARGS LIST)
 #define _MACRO_FOREACH_100(M, LIST) EXPAND(M FIRSTARG LIST) _MACRO_FOREACH_99(M, RESTARGS LIST)
 
-#define foreach(i, a)                        \
-    for (int keep = 1,                       \
-             count = 0,                      \
-             size = sizeof(a) / sizeof *(a); \
-         keep && count != size;              \
-         keep = !keep, count++)              \
-        for (i = (a) + count; keep; keep = !keep)
-
 #endif //__HXC_XARGS_H__
