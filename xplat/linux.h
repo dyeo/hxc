@@ -1,6 +1,19 @@
 #ifndef __HXC_XPLAT_IMPLEMENTATION_H__
 #define __HXC_XPLAT_IMPLEMENTATION_H__
 
+#include <stdbool.h>
+#include "../xstr.h"
+
+bool _mkpath_impl(cstr_t sep, cstr_t path);
+bool _cd_impl(cstr_t path);
+cstr_t _cwd_impl();
+cstr_t _pwd_impl();
+
+#endif
+
+#if defined(XPLAT_IMPLEMENTATION) && !defined(__HXC_XPLAT_IMPLEMENTATION_C__)
+#define __HXC_XPLAT_IMPLEMENTATION_C__
+
 #define _POSIX_C_SOURCE 200809L
 
 #include <sys/stat.h>
@@ -10,21 +23,9 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include "../xarr.h"
-#include "../xstr.h"
-
-bool _mkpath_impl(cstr_t sep, cstr_t path);
-bool _cmd_impl(cstr_t args);
-bool _cd_impl(cstr_t path);
-cstr_t _cwd_impl();
-cstr_t _pwd_impl();
-
-#endif
-
-#if defined(XPLAT_IMPLEMENTATION)
-
 bool _mkpath_impl(cstr_t sep, cstr_t path)
 {
+    info("mkdir -p %s", path);
     bool ok = true;
     size_t sep_len = strlen(sep);
     str_t temp = strnew(path);
@@ -43,9 +44,10 @@ bool _mkpath_impl(cstr_t sep, cstr_t path)
             switch (errno)
             {
             case EEXIST:
+                warning("%s: %s", temp, strerror(errno));
                 break;
             default:
-                fprintf(stderr, "ERROR: %s: %s\n", temp, strerror(errno));
+                error("%s: %s", temp, strerror(errno));
                 ok = false;
             }
         }
@@ -63,22 +65,12 @@ bool _mkpath_impl(cstr_t sep, cstr_t path)
     return ok;
 }
 
-bool _cmd_impl(cstr_t args)
-{
-    printf("[CMD] %s\n", args);
-    if (system(NULL))
-    {
-        return system(args);
-    }
-    return false;
-}
-
 bool _cd_impl(cstr_t path)
 {
-    printf("[CD] %s\n", path);
+    info("cd %s", path);
     if (chdir(path) != 0)
     {
-        fprintf(stderr, "ERROR: %s: %s\n", path, strerror(errno));
+        error("%s: %s", path, strerror(errno));
         return false;
     }
     return true;
@@ -87,9 +79,9 @@ bool _cd_impl(cstr_t path)
 cstr_t _cwd_impl()
 {
     cstr_t path = getcwd(NULL, 0);
-    if(path == NULL)
+    if (path == NULL)
     {
-        fprintf(stderr, "ERROR: CWD: %s\n", strerror(errno));
+        error("CWD: %s", strerror(errno));
     }
     return path;
 }
@@ -97,9 +89,9 @@ cstr_t _cwd_impl()
 cstr_t _pwd_impl()
 {
     cstr_t path = getenv("PWD");
-    if(path == NULL)
+    if (path == NULL)
     {
-        fprintf(stderr, "ERROR: PWD: %s\n", strerror(errno));
+        error("PWD: %s", strerror(errno));
     }
     return path;
 }

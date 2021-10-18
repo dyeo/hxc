@@ -2,3 +2,8 @@
 #define __HXC_XPLAT_IMPLEMENTATION_H__
 
 #endif
+
+#if defined(XPLAT_IMPLEMENTATION) && !defined(__HXC_XPLAT_IMPLEMENTATION_C__)
+#define __HXC_XPLAT_IMPLEMENTATION_C__
+
+#endif

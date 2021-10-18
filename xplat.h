@@ -1,31 +1,31 @@
 #ifndef __HXC_XPLAT_H__
 #define __HXC_XPLAT_H__
 
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stdint.h>
-#include <stdbool.h>
-
-#include "xargs.h"
-#include "xarr.h"
-#include "xstr.h"
-
 // probably need a more sophisticated way of determined 64 or 32 bit
 #if defined(_WIN64) || defined(_LP64) || defined(__LP64__) || defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64) || defined(_M_AMD_64) || defined(__aarch64__)
 #   define XPLAT_64_BIT
 #   define XSIZE 8
-    typedef int64_t xint_t;
-    typedef uint64_t xuint_t;
+    typedef signed long xint_t;
+    typedef unsigned long xuint_t;
 #else
 #   define XPLAT_32_BIT
 #   define XSIZE 4
-    typedef int32_t xint_t;
-    typedef uint32_t xuint_t;
+    typedef signed int xint_t;
+    typedef unsigned int xuint_t;
 #endif
+
+#include "xplat/common.h"
+
+#define CMD_SEP " "
+#define PATH_SEP "/"
+#define ENV_SEP ":"
+#define FILE_ENDL "\n"
 
 #if defined(_WIN64) || defined(_WIN32)
 #   define XPLAT_WINDOWS
+#   define PATH_SEP "\\"
+#   define ENV_SEP ";"
+#   define FILE_ENDL "\r\n"
 #   include "xplat/windows.h"
 #endif
 
@@ -78,15 +78,6 @@
 #elif defined(__posix)
 #   define XPLAT_POSIX
 #   include "xplat/posix.h"
-#endif
-
-#if defined(XPLAT_WINDOWS)
-#   define PATH_SEP "\\"
-#   define ENV_SEP ";"
-#else
-#   define CMD_SEP " "
-#   define PATH_SEP "/"
-#   define ENV_SEP ":"
 #endif
 
 #define PATH(...) strjoin(PATH_SEP, __VA_ARGS__, 0)
